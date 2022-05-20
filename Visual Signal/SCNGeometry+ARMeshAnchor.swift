@@ -35,7 +35,7 @@ public extension SCNGeometry {
         // assign a material suitable for default visualization
         let defaultMaterial = SCNMaterial()
         defaultMaterial.fillMode = .lines
-        defaultMaterial.diffuse.contents = UIColor(displayP3Red: 1, green: 1, blue: 1, alpha: 0.7)
+        defaultMaterial.diffuse.contents = UIColor(displayP3Red: 1, green: 1, blue: 1, alpha: 1)
         geometry.materials = [defaultMaterial]
 
         return geometry

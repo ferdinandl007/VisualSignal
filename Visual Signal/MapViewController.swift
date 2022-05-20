@@ -9,11 +9,11 @@
 import Foundation
 
 import GameplayKit
-import SpriteKit
+import SceneKit
 import UIKit
 
 class MapViewController: UIViewController {
-    let scene = SCNScene()
+    var scene = SCNScene()
     var node: SCNNode?
 
     override func viewDidLoad() {
@@ -36,6 +36,10 @@ class MapViewController: UIViewController {
         print("Add node to scene.")
 
         scene.rootNode.addChildNode(node)
+
+        scene.rootNode.camera?.zFar = 100_000_000
+        scene.rootNode.camera?.zNear = 1
+        scene.rootNode.camera?.orthographicScale = 1000
     }
 
     override var shouldAutorotate: Bool {

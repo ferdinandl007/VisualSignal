@@ -17,6 +17,9 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     var link: CADisplayLink?
     var executionQ = [() -> Void]()
     var particleScen: SCNScene!
+    var lastpoint = SCNVector3()
+
+    var particleSystem: SCNNode?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,8 +35,11 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         let scene = SCNScene(named: "art.scnassets/main.scn")!
         particleScen = SCNScene(named: "art.scnassets/SceneKitScene.scn")
 
+        particleSystem = (particleScen?.rootNode.childNode(withName: "particles", recursively: true)!)
+
         // Set the scene to the view
         sceneView.scene = scene
+        sceneView.scene.background.intensity = 0
 
         UIApplication.shared.isIdleTimerDisabled = true
 
@@ -84,13 +90,32 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
 
         recordButton.setTitle("stop recording", for: .normal)
 
-        recordingTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { _ in
-            let signal = self.wifiStrength()
-            self.executionQ.append {
-                self.addParticleSystem(pos: self.sceneView.pointOfView!.worldPosition, signalStrength: signal)
+        recordingTimer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true, block: { _ in
+
+            let dis = self.distanceFromCamera(x: self.lastpoint.x, y: self.lastpoint.y, z: self.lastpoint.z)
+            if dis >= 1.0 {
+                let signal = self.wifiStrength()
+                let pos = self.sceneView.pointOfView!.worldPosition
+                self.executionQ.append {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        self.addParticleSystem(pos: pos, signalStrength: signal)
+                    }
+                }
+                guard let pointOfView = self.sceneView.session.currentFrame else { return }
+                let cameraPosition = pointOfView.camera.transform.columns.3
+                self.lastpoint = SCNVector3Make(cameraPosition.x, cameraPosition.y, cameraPosition.z)
             }
+
         })
         recordingTimer?.fire()
+    }
+
+    func createTrail(color: UIColor) -> SCNParticleSystem {
+        let scene = SCNScene(named: "art.scnassets/SceneKitScene.scn")
+        let node: SCNNode = (scene?.rootNode.childNode(withName: "particles", recursively: true)!)!
+        let particleSystem: SCNParticleSystem = (node.particleSystems?.first)!
+        particleSystem.particleColor = color
+        return particleSystem
     }
 
     @IBAction func goToMap(_: Any) {
@@ -104,11 +129,10 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
 //                }
 //            }
 //        }
-        recordingTimer?.invalidate()
-        recordingTimer = nil
+
         let mainStoryboard = UIStoryboard(name: "Main", bundle: Bundle.main)
         if let viewController = mainStoryboard.instantiateViewController(withIdentifier: "Map") as? MapViewController {
-            viewController.scene.rootNode.addChildNode(sceneView.scene.rootNode)
+            viewController.scene = sceneView.scene
             present(viewController, animated: true, completion: nil)
         }
     }
@@ -211,23 +235,21 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         return strength
     }
 
+    func distanceFromCamera(x: Float, y: Float, z: Float) -> Float {
+        guard let pointOfView = sceneView.session.currentFrame else { return 0.0 }
+        let cameraPosition = pointOfView.camera.transform.columns.3
+        let vector = SCNVector3Make(cameraPosition.x - x, cameraPosition.y - y, cameraPosition.z - z)
+        // Scene units map to meters in ARKit.
+        return sqrtf(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z)
+    }
+
     func addParticleSystem(pos: SCNVector3, signalStrength: Double) {
-        let particlesNode: SCNNode = (particleScen?.rootNode.childNode(withName: "particles", recursively: true)!)!.clone()
-
-        let particleSystem: SCNParticleSystem = (particlesNode.particleSystems?.first)!.copy() as! SCNParticleSystem
-
-        particlesNode.removeAllParticleSystems()
-
-        particleSystem.particleColor = UIColor.red.blend(to: UIColor.green, percent: signalStrength)
-
-        particlesNode.addParticleSystem(particleSystem)
-
-        let nods = knownAnchors.map { $0.value }
-
-        particleSystem.colliderNodes = nods
-        particlesNode.position = pos
-
-        sceneView.scene.rootNode.addChildNode(particlesNode)
+        let newNode = SCNNode() // particleSystem!.clone() as SCNNode
+        newNode.position = pos
+        let p = createTrail(color: UIColor.red.blend(to: UIColor.green, percent: signalStrength))
+        newNode.addParticleSystem(p)
+//
+        sceneView.scene.rootNode.addChildNode(newNode)
     }
 
     func export() {
@@ -292,7 +314,6 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     }
 
     func session(_: ARSession, didAdd anchors: [ARAnchor]) {
-        print("didAdd")
         for anchor in anchors {
             var sceneNode: SCNNode?
             sceneNode?.name = "meshAnchor"
@@ -471,10 +492,7 @@ extension UIApplication {
 }
 
 extension UIColor {
-    // This function calculates a new color by blending the two colors.
-    // A percent of 0.0 gives the "self" color
-    // A percent of 1.0 gives the "to" color
-    // Any other percent gives an appropriate color in between the two
+ 
     func blend(to: UIColor, percent: Double) -> UIColor {
         var fR: CGFloat = 0.0
         var fG: CGFloat = 0.0

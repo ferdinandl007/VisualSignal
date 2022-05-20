@@ -16,6 +16,7 @@
 		CFBEC94B2823AD3500AD8DAE /* SCNGeometry+ARMeshAnchor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBEC94A2823AD3500AD8DAE /* SCNGeometry+ARMeshAnchor.swift */; };
 		CFBEC9502824E20A00AD8DAE /* pngaaa.com-442433.png in Resources */ = {isa = PBXBuildFile; fileRef = CFBEC94F2824E20A00AD8DAE /* pngaaa.com-442433.png */; };
 		CFBEC9522825066900AD8DAE /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBEC9512825066900AD8DAE /* MapViewController.swift */; };
+		CFD00735282A25B500C0EF05 /* cam.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD00734282A25B500C0EF05 /* cam.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		CFBEC94A2823AD3500AD8DAE /* SCNGeometry+ARMeshAnchor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SCNGeometry+ARMeshAnchor.swift"; sourceTree = "<group>"; };
 		CFBEC94F2824E20A00AD8DAE /* pngaaa.com-442433.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pngaaa.com-442433.png"; sourceTree = "<group>"; };
 		CFBEC9512825066900AD8DAE /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
+		CFD00734282A25B500C0EF05 /* cam.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = cam.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +68,7 @@
 				44B0AA9121D693E200AC1F19 /* art.scnassets */,
 				44B0AA9321D693E200AC1F19 /* ViewController.swift */,
 				CFBEC9512825066900AD8DAE /* MapViewController.swift */,
+				CFD00734282A25B500C0EF05 /* cam.swift */,
 				CFBEC94A2823AD3500AD8DAE /* SCNGeometry+ARMeshAnchor.swift */,
 				44B0AA9521D693E200AC1F19 /* Main.storyboard */,
 				44B0AA9821D693E200AC1F19 /* Assets.xcassets */,
@@ -170,6 +173,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CFD00735282A25B500C0EF05 /* cam.swift in Sources */,
 				CFBEC94B2823AD3500AD8DAE /* SCNGeometry+ARMeshAnchor.swift in Sources */,
 				44B0AA9421D693E200AC1F19 /* ViewController.swift in Sources */,
 				44B0AA9021D693E200AC1F19 /* AppDelegate.swift in Sources */,
